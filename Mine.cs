@@ -24,7 +24,11 @@ class Mine {
 		} else if(Event.type == SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN) {
 		    int x = Event.button.x / 32;
 		    int y = Event.button.y / 32;
-		    field.Reveal(x, y);
+		    if(Event.button.button == SDL.SDL_BUTTON_LEFT) {
+			field.Reveal(x, y);
+		    } else if(Event.button.button == SDL.SDL_BUTTON_RIGHT) {
+			field.Flag(x, y);
+		    }
 		}
 	    }
 	    gfx.Render();

@@ -7,9 +7,10 @@ class Field {
     private Gfx gfx;
     private CellType[,] cells;
     private Visibility[,] visibility;
+    private bool[,] visited;
+    private bool[,] flagged;
     private int width {get {return cells.GetLength(0);}}
     private int height {get {return cells.GetLength(1);}}
-    private bool[,] visited;
     private int[] offsetX = {-1, 0, 1, -1, 1, -1, 0, 1};
     private int[] offsetY = {-1, -1, -1, 0, 0, 1, 1, 1};
 
@@ -18,6 +19,7 @@ class Field {
 	cells = new CellType[gfx.cols, gfx.rows];
 	visibility = new Visibility[gfx.cols, gfx.rows];
 	visited = new bool[width, height];
+	flagged = new bool[width, height];
 	for(int y = 0;y < height;y++) {
 	    for(int x = 0;x < width;x++) {
 		cells[x,y] = CellType.Empty;
@@ -44,12 +46,28 @@ class Field {
 	    return;
 	}
 
+	visibility[x,y] = Visibility.Revealed;
+
 	if(cells[x,y] == CellType.Mine) {
 	    Console.WriteLine("!!!BOOOOOOM!!!");
 	    gfx.SetTile(11, x, y);
 	} else {
 	    StartRecursiveReveal(x, y);
 	}
+    }
+
+    public void Flag(int x, int y) {
+	if(visibility[x,y] == Visibility.Revealed) {
+	    return;
+	}
+
+	if(flagged[x,y]) {
+	    gfx.SetTile(10, x, y);
+	} else {
+	    gfx.SetTile(9, x, y);
+	}
+
+	flagged[x,y] = !flagged[x,y];
     }
 
     private void StartRecursiveReveal(int x, int y) {
