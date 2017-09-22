@@ -13,6 +13,7 @@ class Field {
     private int height {get {return cells.GetLength(1);}}
     private int[] offsetX = {-1, 0, 1, -1, 1, -1, 0, 1};
     private int[] offsetY = {-1, -1, -1, 0, 0, 1, 1, 1};
+    private int numberOfMines;
 
     public Field(Gfx gfx) {
 	this.gfx = gfx;
@@ -39,6 +40,7 @@ class Field {
 	    int y = positions[i] / width;
 	    cells[x,y] = CellType.Mine;
 	}
+	numberOfMines = amount;
     }
 
     public void Reveal(int x, int y) {
@@ -54,6 +56,10 @@ class Field {
 	} else {
 	    StartRecursiveReveal(x, y);
 	}
+
+	if(CountRevealed() + numberOfMines == width * height) {
+	    Console.WriteLine("WINNER IS YOU!");
+	}
     }
 
     public void Flag(int x, int y) {
@@ -68,6 +74,16 @@ class Field {
 	}
 
 	flagged[x,y] = !flagged[x,y];
+    }
+
+    private int CountRevealed() {
+	int revealed = 0;
+	for (int y = 0;y < height;y++) {
+	    for(int x = 0;x < width;x++) {
+		revealed += (visibility[x,y] == Visibility.Revealed ? 1 : 0);
+	    }
+	}
+	return revealed;
     }
 
     private void StartRecursiveReveal(int x, int y) {
