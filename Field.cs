@@ -14,6 +14,7 @@ class Field {
     private int[] offsetX = {-1, 0, 1, -1, 1, -1, 0, 1};
     private int[] offsetY = {-1, -1, -1, 0, 0, 1, 1, 1};
     private int numberOfMines;
+    private bool gameOver = false;
 
     public Field(Gfx gfx) {
 	this.gfx = gfx;
@@ -21,12 +22,7 @@ class Field {
 	visibility = new Visibility[gfx.cols, gfx.rows];
 	visited = new bool[width, height];
 	flagged = new bool[width, height];
-	for(int y = 0;y < height;y++) {
-	    for(int x = 0;x < width;x++) {
-		cells[x,y] = CellType.Empty;
-		visibility[x,y] = Visibility.Hidden;
-	    }
-	}
+	Clear();
     }
 
     public void AddMines(int amount) {
@@ -53,12 +49,14 @@ class Field {
 	if(cells[x,y] == CellType.Mine) {
 	    Console.WriteLine("!!!BOOOOOOM!!!");
 	    gfx.SetTile(11, x, y);
+	    gameOver = true;
 	} else {
 	    StartRecursiveReveal(x, y);
 	}
 
 	if(CountRevealed() + numberOfMines == width * height) {
 	    Console.WriteLine("WINNER IS YOU!");
+	    gameOver = true;
 	}
     }
 
@@ -74,6 +72,26 @@ class Field {
 	}
 
 	flagged[x,y] = !flagged[x,y];
+    }
+
+    public bool GameOver() {
+	return gameOver;
+    }
+
+    public void Reset() {
+	Clear();
+	AddMines(numberOfMines);
+	gameOver = false;
+    }
+
+    private void Clear() {
+	for(int y = 0;y < height;y++) {
+	    for(int x = 0;x < width;x++) {
+		cells[x,y] = CellType.Empty;
+		visibility[x,y] = Visibility.Hidden;
+		gfx.SetTile(10, x, y);
+	    }
+	}
     }
 
     private int CountRevealed() {
